@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Basic EC2 INstance
+
+Resources:
+  DevEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-0f403e3180720dd7e
+      InstanceType: t2.micro
+      KeyName: cfn-key-1
+      Tags: 
+        - Key: "Name"
+          Value: "Prod"
+      SecurityGroups:
+        - default
+        - !Ref SSHSecurityGroup
+  SSHSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: My new SSH SG
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 0.0.0.0/0    #Create new SG rule in existing security group
+        - IpProtocol: tcp
+          FromPort: '8080'
+          ToPort: '8080'
+          CidrIp: 0.0.0.0/0
+  MyElasticIp:
+    Type: AWS::EC2::EIP
+    Properties:
+      InstanceId: !Ref DevEC2Instance
