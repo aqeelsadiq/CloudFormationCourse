@@ -36,3 +36,7 @@ Resources:
         - !Ref EnvironmentName
         - InstanceType
       KeyName: !Ref MyKeyName
+
+      SecurityGroups:
+        !ImportValue MySecurityGroup
+      AvailabilityZone: !ImportValue Stack1-InstanceAz

@@ -23,6 +23,9 @@ Mappings:
     prod: 
       InstanceType: t2.small
 
+Conditions:
+  CreateEIPForProd: !Equals [!Ref EnvironmentName, prod]
+
 Resources:
   DevEC2Instance:
     Type: AWS::EC2::Instance
@@ -36,3 +39,9 @@ Resources:
         - !Ref EnvironmentName
         - InstanceType
       KeyName: !Ref MyKeyName
+  
+  MyEIPProd:
+    Type: AWS::EC2::EIP
+    condition: CreateEIPForProd
+    Properties:
+      InstanceId: !Ref DevEC2Instance

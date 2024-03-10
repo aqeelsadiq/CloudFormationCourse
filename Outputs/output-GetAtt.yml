@@ -36,3 +36,22 @@ Resources:
         - !Ref EnvironmentName
         - InstanceType
       KeyName: !Ref MyKeyName
+  MySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: MySG
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 0.0.0.0/0
+Outputs:
+  MyInstanceId:
+    Description: My Instance Id
+    Value: !Ref DevEC2Instance
+  MyDNSName:
+    Description: My DNS name for Instance
+    Value: !GetAtt DevEC2Instance.PublicDnsName
+  MyAvailabilityZone:
+    Description: My AZ
+    Value: !GetAtt DevEC2Instance.AvailabilityZone

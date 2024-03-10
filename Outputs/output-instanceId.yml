@@ -36,3 +36,8 @@ Resources:
         - !Ref EnvironmentName
         - InstanceType
       KeyName: !Ref MyKeyName
+
+Outputs:
+  MyInstanceId:
+    Description: My Instance Id
+    Value: !Ref DevEC2Instance

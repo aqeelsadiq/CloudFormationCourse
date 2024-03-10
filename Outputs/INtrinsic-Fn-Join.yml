@@ -1,0 +1,72 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Basic EC2 INstance
+Parameters:
+  MyKeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: select the KeyPair
+  EnvironmentName:
+    Description: Select the environment
+    Type: string
+    Default: dev
+    AllowedValues:
+      - dev
+      - prod
+    ConstraintDescription: Must be development of production
+Mappings:
+  MyRegionMap:
+    us-east-1a:
+      HVM64: ami-0f403e3180720dd7e
+    us-east-1b:
+      HVM64: ami-0f403e3180720dd7e
+  MyEnvironmentMap:
+    dev:
+      InstanceType: t2.micro
+    prod: 
+      InstanceType: t2.small
+Conditions:
+  CreateDevSecurityGroup: !Equals [!Ref EnvironmentName, dev]
+
+Resources:
+  DevEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !FindInMap
+        - MyRegionMap
+        - !Ref 'AWS::Region'
+        - HVM64
+      InstanceType: FindInMap
+        - MyEnvironmentMap
+        - !Ref EnvironmentName
+        - InstanceType
+      KeyName: !Ref MyKeyName
+      SecurityGroup:
+        - !Ref MySecurityGroup
+  MySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Condition: CreateDevSecurityGroup
+    Properties:
+      GroupDescription: MySG
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 0.0.0.0/0
+
+Outputs:
+  MyInstanceId:
+    Description: My Instance Id
+    Value: !Ref DevEC2Instance
+  MyDNSName:
+    Description: My DNS name for Instance
+    Value: !GetAtt DevEC2Instance.PublicDnsName
+  MyAvailabilityZone:
+    Description: My AZ
+    Value: !GetAtt DevEC2Instance.AvailabilityZone
+    Export:
+      Name: !Sub "${AWS::StackName}-InstanceAz"
+  MySecurityGroup:
+    Description: My Security Group
+    Value: !Ref MySecurityGroup
+    Condition: CreateDevSecurityGroup
+    Export: 
+      Name: !Join [":", [!Ref 'AWS::StackName', MySecurityGroup]]
